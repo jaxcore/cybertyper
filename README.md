@@ -26,6 +26,12 @@ const voice = new Say({
 });
 ```
 
+### Jaxcore Say WebWorkers
+
+The say library is used for speech synthesis.  The webworker file set in `setWorkers()` must be copied to the public html directory (eg public/webworkers):
+
+`espeak-en-worker.js` can be downloaded from [here](https://github.com/jaxcore/jaxcore-say/tree/master/dist)
+
 ### Create a "script"
 
 A CyberTyper script is an array of lines which will be speech synthesized and typed:
@@ -85,3 +91,42 @@ const cyberTyperScript = [
 ```
 
 The component will not begin until the `start` property is set to true.  Beware, this cannot be autostarted on page load because web browsers disable JavaScript AudioContext usage until after a user action.  The examples show how to set `start={true}` from a button click.
+
+### Custom CSS
+
+The `\<CyberTyper/\>` component does not include any CSS of it's own.  But the DIV and SPAN elements have the `.CyberTyper` class defined which can be used to customize how the generated lines look, including the styling of a cursor.
+
+```
+.CyberTyper {
+    text-align: center;
+}
+.CyberTyperLine {
+    position: relative;
+}
+.CyberTyperLineBreak {
+    clear: both;
+}
+.CyberTyperLineCursor {
+    position: relative;
+    animation: blinker 1s linear infinite;
+    margin-left: 1em;
+}
+.CyberTyperLineCursor::after {
+    content: "▌";
+}
+.CyberTyperLineFloatingCursor {
+    position: absolute;
+}
+.CyberTyperLineFloatingCursor::after {
+    content: "▌";
+}
+.CyberTyperLineFloatingCursor.CyberTyperFlashing {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+```

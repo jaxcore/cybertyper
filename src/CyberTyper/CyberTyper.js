@@ -56,10 +56,15 @@ class CyberTyper extends Component {
 		});
 		//console.log('processedScript', processedScript);
 		
+		let hideCursorWhenDone = true;
+		if ('hideCursorWhenDone' in props) hideCursorWhenDone = props.hideCursorWhenDone;
+		
 		this.state = {
+			hideCursorWhenDone,
 			script: processedScript,
 			lines: [],
 			progress: 0,
+			done: false,
 			started: props.start || false,
 			syllableDuration: 300
 		};
@@ -114,8 +119,8 @@ class CyberTyper extends Component {
 	}
 	
 	renderCursor() {
-		if (this.state.isDelaying) {
-			return (<div className="CyberTyperLineCursor" />);
+		if (this.state.isDelaying || (this.state.done && !this.state.hideCursorWhenDone)) {
+			return (<div className="CyberTyperLineCursor CyberTyperFlashing" />);
 		}
 	}
 	
@@ -129,7 +134,6 @@ class CyberTyper extends Component {
 					let sayProfile = line.sayProfile || this.props.defaultSayProfile;
 					if (line.linebreak) {
 						return (<CyberTyperLineBreak key={lineNum}
-													 cursor={this.props.cursor}
 													 delay={line.delay}
 						
 													 onstarted={line.onstarted}
@@ -146,7 +150,6 @@ class CyberTyper extends Component {
 					else {
 						return (<CyberTyperLine key={lineNum}
 												voice={this.props.say}
-												cursor={this.props.cursor}
 												text={line.text}
 												speaker={line.speaker}
 												delay={line.delay}
@@ -205,9 +208,13 @@ class CyberTyper extends Component {
 			});
 		}
 		else {
-			if (this.props.onComplete) {
-				this.props.onComplete();
-			}
+			this.setState({
+				done: true
+			}, () => {
+				if (this.props.onComplete) {
+					this.props.onComplete();
+				}
+			});
 		}
 	}
 }

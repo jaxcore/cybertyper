@@ -165,15 +165,20 @@ class CyberTyperLine extends Component {
 		return (
 			<div className="CyberTyperLine">
 				{this.state.text}
-				{this.renderFloatingCursor()}
+				{this.renderCursor()}
 			</div>
 		);
 	}
 	
-	renderFloatingCursor() {
-		if (!this.state.isDelaying && !this.state.done && this.props.cursor) {
-			let clss = "CyberTyperLineFloatingCursor";
-			return (<span className={clss} />);
+	renderCursor() {
+		if (!this.state.isDelaying && !this.state.done) {
+			if (this.state.text.length) {
+				let clss = "CyberTyperLineFloatingCursor";
+				return (<span className={clss}/>);
+			}
+			else {
+				return (<div className="CyberTyperLineCursor CyberTyperFlashing" />);
+			}
 		}
 	}
 }
