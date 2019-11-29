@@ -1,0 +1,32 @@
+.CyberTyper {
+    text-align: center;
+}
+.CyberTyperLine {
+    position: relative;
+}
+.CyberTyperLineBreak {
+    clear: both;
+}
+.CyberTyperLineCursor {
+    position: relative;
+    animation: blinker 1s linear infinite;
+    margin-left: 1em;
+}
+.CyberTyperLineCursor::after {
+    content: "▌";
+}
+.CyberTyperLineFloatingCursor {
+    position: absolute;
+}
+.CyberTyperLineFloatingCursor::after {
+    content: "▌";
+}
+.CyberTyperLineFloatingCursor.CyberTyperFlashing {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
