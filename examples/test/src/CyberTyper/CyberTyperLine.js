@@ -50,7 +50,6 @@ class CyberTyperLine extends Component {
 			cursor: true,
 			wordProgress: 0,
 			letterProgress: 0,
-			// words,
 			duration: 0,
 			letterDuration: 0,
 			totalDuration,
@@ -66,7 +65,12 @@ class CyberTyperLine extends Component {
 	componentDidMount() {
 		this.props.onStart();
 		if (this.props.onstarted) this.props.onstarted();
-		this.next();
+		
+		// todo: use getAudioData
+		this.props.voice.say(this.props.text).then(() => {
+			this.next();
+		});
+		
 	}
 	
 	next() {
@@ -147,7 +151,6 @@ class CyberTyperLine extends Component {
 			else {
 				if (this.state.letterDuration) {
 					setTimeout(() => {
-						// debugger;
 						this.next();
 					}, this.state.letterDuration);
 				}

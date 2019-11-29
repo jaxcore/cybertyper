@@ -95,6 +95,7 @@ class CyberTyper extends Component {
 					}
 					else {
 						return (<CyberTyperLine key={lineNum}
+												voice={this.props.say}
 												cursor={this.props.cursor}
 												text={line.text}
 												sayProfile={sayProfile}
