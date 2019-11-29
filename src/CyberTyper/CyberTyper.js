@@ -1,13 +1,63 @@
 import React, {Component} from 'react';
-import './CyberTyper.css';
+// import './CyberTyper.css';
 import CyberTyperLine from './CyberTyperLine';
 import CyberTyperLineBreak from './CyberTyperLineBreak';
 
 class CyberTyper extends Component {
 	constructor(props) {
 		super(props);
+		
+		let script = props.script;
+		let processedScript = [];
+		script.forEach((line) => {
+			if (line.text) {
+				if (line.text.forEach) {
+					line.text.forEach((t, index) => {
+						const s = {
+							text: t
+						};
+						if (index === 0) {
+							s.speaker = {
+								...line.speaker,
+								displayName: true
+							};
+						}
+						else {
+							s.speaker = {
+								...line.speaker,
+								displayName: false
+							};
+						}
+						processedScript.push(s);
+					});
+				}
+				else if (line.text.toString) {
+					processedScript.push({
+						text: line.text.toString(),
+						speaker: line.speaker
+					});
+				}
+			}
+			if (line.linebreak) {
+				if (typeof line.linebreak === 'number') {
+					for (let i=0;i<line.linebreak;i++) {
+						processedScript.push({
+							linebreak: true
+						});
+					}
+				}
+				else {
+					processedScript.push({
+						linebreak: true
+					});
+				}
+			}
+		
+		});
+		//console.log('processedScript', processedScript);
+		
 		this.state = {
-			script: props.script,
+			script: processedScript,
 			lines: [],
 			progress: 0,
 			started: props.start || false,
@@ -98,7 +148,7 @@ class CyberTyper extends Component {
 												voice={this.props.say}
 												cursor={this.props.cursor}
 												text={line.text}
-												sayProfile={sayProfile}
+												speaker={line.speaker}
 												delay={line.delay}
 												syllableDuration={this.state.syllableDuration}
 												onstarted={line.onstarted}

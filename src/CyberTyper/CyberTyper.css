@@ -14,12 +14,15 @@
 }
 .CyberTyperLineCursor::after {
     content: "▌";
+    color: red;
 }
 .CyberTyperLineFloatingCursor {
     position: absolute;
+    /*margin-left: 0em;*/
 }
 .CyberTyperLineFloatingCursor::after {
     content: "▌";
+    color: blue;
 }
 .CyberTyperLineFloatingCursor.CyberTyperFlashing {
     animation: blinker 1s linear infinite;

@@ -53,9 +53,9 @@ class CyberTyperLine extends Component {
 			duration: 0,
 			letterDuration: 0,
 			totalDuration,
-			lineBreakDuration: 300,
+			lineBreakDuration: 100,
 			spaceDuration: 100,
-			periodDuration: 1000,
+			periodDuration: 100,
 			totalSyllables,
 			letterCount: props.text.length,
 			wordIntervals
@@ -67,7 +67,9 @@ class CyberTyperLine extends Component {
 		if (this.props.onstarted) this.props.onstarted();
 		
 		// todo: use getAudioData
-		this.props.voice.say(this.props.text).then(() => {
+		this.props.voice.say(this.props.text, {
+			profile: this.props.speaker? this.props.speaker.voice:null
+		}).then(() => {
 			this.next();
 		});
 		

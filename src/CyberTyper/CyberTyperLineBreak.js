@@ -28,7 +28,7 @@ class CyberTyperLineBreak extends Component {
 			c = (<br/>);
 		}
 		else {
-			c = this.renderCursor();
+			c = (<span>{'&nbsp'}{this.renderCursor()}</span>);
 		}
 		return (<div className="CyberTyperLineBreak">
 			{ c }

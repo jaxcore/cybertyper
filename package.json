@@ -1,0 +1,50 @@
+{
+  "name": "cybertyper",
+  "version": "0.0.1",
+  "description": "ReactJS component for automatically typing text synchronized with speech synthesis & recognition",
+  "main": "build/index.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack --watch",
+    "build": "webpack",
+    "build-examples": "cd examples/palefire && yarn build",
+    "copydocs": "rm -rf docs/palefire && cp -r examples/palefire/build docs/palefire",
+    "build-docs": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaxcore/cybertyper.git"
+  },
+  "keywords": [
+    "ReactJS",
+    "typewriter",
+    "speech",
+    "recognition",
+    "speech",
+    "synthesis"
+  ],
+  "author": "Dan Steinman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jaxcore/cybertyper/issues"
+  },
+  "homepage": "https://github.com/jaxcore/cybertyper#readme",
+  "dependencies": {
+    "react": "^16.12.0",
+    "syllable": "^4.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "babel-loader": "8.0.5",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "webpack": "4.29.6",
+    "webpack-cli": "^3.3.10"
+  }
+}
