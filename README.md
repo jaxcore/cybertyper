@@ -22,7 +22,7 @@ Say.setWorkers({
 	'espeak': 'webworkers/espeak-en-worker.js'
 });
 const voice = new Say({
-	language: 'en-us',
+	language: 'en-us'
 });
 ```
 
@@ -101,6 +101,7 @@ const cyberTyperScript = [
 
 ```
 <CyberTyper
+    autostart={true}
 	script={cyberTyperScript}
 	maxLines={15}
 	lineBreakDuration={200}
@@ -116,4 +117,4 @@ Beware: web browsers disable JavaScript AudioContext usage until after a user ac
 
 The `<CyberTyper/>` component does not include any CSS of it's own.  But the DIV and SPAN elements have `.CyberTyper` classes defined which can be used to customize how the generated lines look, including the styling of a cursor and names.
 
-See [CyberTyper.css](https://github.com/jaxcore/cybertyper/blob/master/examples/palefire/src/CyberTyper.css)
+See [CyberTyper.css](https://github.com/jaxcore/cybertyper/blob/master/src/CyberTyper/CyberTyper.css)
