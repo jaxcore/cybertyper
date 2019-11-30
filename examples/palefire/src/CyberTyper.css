@@ -4,6 +4,16 @@
 .CyberTyperLine {
     position: relative;
 }
+.CyberTyperLineText {
+    font-size: 13pt;
+}
+.CyberTyperLineName {
+    font-size: 13pt;
+    font-weight: bold;
+}
+.CyberTyperLineName:after {
+    content: ": ";
+}
 .CyberTyperLineBreak {
     clear: both;
 }
@@ -29,4 +39,11 @@
     50% {
         opacity: 0;
     }
+}
+
+.grey {
+    color: #666;
+}
+.blue {
+    color: #005;
 }

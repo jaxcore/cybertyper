@@ -17,29 +17,34 @@ class CyberTyper extends Component {
 				if (line.text.forEach) {
 					line.text.forEach((t, index) => {
 						const s = {
-							text: t
+							text: t,
+							lineNum: processedScript.length,
+							lineClass: line.className,
+							displayName: line.displayName
 						};
 						if (index === 0) {
-							s.speaker = {
-								...line.speaker,
-								displayName: true,
-								lineNum: processedScript.length
-							};
+							if (line.speaker) {
+								s.speaker = line.speaker;
+							}
 						}
 						else {
-							s.speaker = {
-								...line.speaker,
-								displayName: false,
-								lineNum: processedScript.length
-							};
+							if (line.speaker) {
+								s.speaker = {
+									voice: line.speaker.voice,
+									className: line.speaker.className,
+								};
+							}
 						}
+						
 						processedScript.push(s);
 					});
 				}
 				else if (line.text.toString) {
 					processedScript.push({
+						speaker: line.speaker? line.speaker : null,
 						text: line.text.toString(),
-						speaker: line.speaker,
+						lineClass: line.className,
+						name: line.speaker? line.speaker.name : null,
 						lineNum: processedScript.length
 					});
 				}
@@ -71,7 +76,7 @@ class CyberTyper extends Component {
 			lines: [],
 			progress: 0,
 			done: false,
-			started: props.start || false,
+			// started: props.start || false,
 			syllableDuration: 300
 		};
 		
@@ -97,19 +102,39 @@ class CyberTyper extends Component {
 		else return null;
 	}
 	
-	componentDidUpdate(prevProps, prevState, snapshot) {
-		if (snapshot && 'started' in snapshot) {
-			this.cacheNextAudio(0, (duration) => {
-				this.next();
-			});
+	componentDidMount() {
+		if (this.props.autostart) {
+			this.start();
 		}
 	}
 	
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		if (snapshot && 'started' in snapshot) {
+			if (snapshot.started) {
+				this.start();
+			}
+			else {
+				this.stop();
+			}
+		}
+	}
+	
+	start() {
+		this.setState({
+			started: true,
+		}, () => {
+			this.cacheNextAudio(0, (duration) => {
+				this.next();
+			});
+		});
+	}
+	
 	next() {
+		// console.log('next');
+		
 		let progress = this.state.progress + 1;
 		let script = this.state.script;
 		if (progress <= script.length) {
-			
 			const scriptline = script[progress - 1];
 			
 			const done = () => {
@@ -129,17 +154,21 @@ class CyberTyper extends Component {
 				done();
 			}
 			else if (scriptline.text) {
-				if (scriptline.cached) {
-					done();
+				if (scriptline.speaker && scriptline.voice) {
+					if (scriptline.cached) {
+						done();
+					}
+					else {
+						console.log('waiting for audio cache', scriptline);
+						this.events.once('audio-cached-' + scriptline.lineNum, (duration) => {
+							done();
+						});
+					}
 				}
 				else {
-					// console.log('waiting for audio cache', scriptline);
-					this.events.once('audio-cached-' + scriptline.lineNum, (duration) => {
-						done();
-					});
+					done();
 				}
 			}
-			
 		}
 	}
 	
@@ -165,7 +194,6 @@ class CyberTyper extends Component {
 			return lines.map((line, index) => {
 				const lineNum = line.lineNum;
 				if (line.started) {
-					let sayProfile = line.sayProfile || this.props.defaultSayProfile;
 					if (line.linebreak) {
 						return (<CyberTyperLineBreak key={lineNum}
 													 delay={line.delay}
@@ -180,9 +208,14 @@ class CyberTyper extends Component {
 					else {
 						return (<CyberTyperLine key={lineNum}
 												text={line.text}
+												speaker={line.speaker}
+												lineClass={line.lineClass}
+												displayName={line.displayName}
+												name={line.name}
 												duration={line.duration}
 												delay={line.delay}
 												syllableDuration={this.state.syllableDuration}
+												// lineBreakDuration={this.props.lineBreakDuration||100}
 												onStart={(callback) => {
 													this.onStart(lineNum, line, callback);
 												}}
@@ -205,19 +238,32 @@ class CyberTyper extends Component {
 			callback();
 		}
 		else if (line.text) {
-			if (line.cached) {
-				if (this.audioCache.next.lineNum === index) {
-					this.audioCache.current = this.audioCache.next;
-					this.audioCache.next = null;
-					this.cacheNextAudio(index + 1);
-					this.playCurrentAudio();
-					
-					callback();
-				}
-				else console.log('wrong num', this.audioCache.next);
+			if (!line.speaker || !line.speaker.voice) {
+				this.cacheNextAudio(index + 1);
+				callback();
 			}
 			else {
-				console.log('audio onStart NOT CACHED');
+				if (line.cached) {
+					if (this.audioCache.next.lineNum === index) {
+						this.audioCache.current = this.audioCache.next;
+						this.audioCache.next = null;
+						this.cacheNextAudio(index + 1);
+						this.playCurrentAudio();
+						callback();
+					}
+					else console.log('wrong num', this.audioCache.next);
+				}
+				else {
+					// console.log('audio onStart NOT CACHED wait for', line);
+					this.events.once('audio-cached-' + line.lineNum, (duration) => {
+						// console.log('audio onStart GOT CACHED', line);
+						this.audioCache.current = this.audioCache.next;
+						this.audioCache.next = null;
+						this.cacheNextAudio(index + 1);
+						this.playCurrentAudio();
+						callback();
+					});
+				}
 			}
 		}
 	}
@@ -254,6 +300,12 @@ class CyberTyper extends Component {
 			return;
 		}
 		
+		if (line.speaker && !line.speaker.voice) {
+			// console.log('NO SPEAKER VOICE');
+			if (callback) callback(null);
+			return;
+		}
+		
 		const sayOptions = {};
 		if (line.speaker && line.speaker.voice) {
 			sayOptions.profile = line.speaker.voice;
@@ -285,7 +337,7 @@ class CyberTyper extends Component {
 	}
 	
 	onEnd(index, line) {
-		let lineBreakDuration = this.props.lineBreakDuration || 200;
+		let lineBreakDuration = this.props.lineBreakDuration; // || 100;
 		
 		let progress = this.state.progress + 1;
 		const script = this.state.script;
@@ -317,13 +369,16 @@ class CyberTyper extends Component {
 							this.next();
 						}
 						else if (line.text) {
-							if (this.audioCache.current.audioEnded) {
-								this.next();
+							if (line.speaker && line.speaker.voice) {
+								if (this.audioCache.current.audioEnded) {
+									this.next();
+								}
+								else {
+									// console.log('waiting for audio-ended');
+									this.audioCache.current.lineEnded = true;
+								}
 							}
-							else {
-								// console.log('waiting for audio-ended');
-								this.audioCache.current.lineEnded = true;
-							}
+							else this.next();
 						}
 					});
 				}, delay);

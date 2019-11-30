@@ -25,7 +25,6 @@ class CyberTyperLine extends Component {
 			});
 			
 			if (index < words.length - 1) {
-				// totalSyllables += 1;
 				totalSpaces += 1;
 				
 				wordIntervals.push({
@@ -42,7 +41,7 @@ class CyberTyperLine extends Component {
 		if (this.props.duration) {
 			// generate the syllableDuration based on the audio duration
 			totalDuration = this.props.duration;
-			syllableDuration = (totalDuration / totalSyllables) * 0.94;
+			syllableDuration = (totalDuration / totalSyllables) * 0.88; // about 88% speed seems to be necessary to keep up with the actual audio playback
 		}
 		else {
 			// generate the duration based on a fixed syllable duration
@@ -61,9 +60,6 @@ class CyberTyperLine extends Component {
 			totalDuration,
 			accumulatedDuration: 0,
 			syllableDuration,
-			lineBreakDuration: 100,
-			// spaceDuration: 100,
-			// periodDuration: 100,
 			totalSyllables,
 			letterCount: props.text.length,
 			wordIntervals
@@ -155,7 +151,7 @@ class CyberTyperLine extends Component {
 							this.props.onEnd();
 							if (this.props.onended) this.props.onended();
 						});
-					}, this.state.lineBreakDuration);
+					}, 1); //this.props.lineBreakDuration);
 					
 				});
 			}
@@ -169,12 +165,25 @@ class CyberTyperLine extends Component {
 	}
 	
 	render() {
+		let clss = 'CyberTyperLine';
+		if (this.props.lineClass) clss += ' '+this.props.lineClass;
+		if (this.props.speaker) clss += ' '+this.props.speaker.className;
 		return (
-			<div className="CyberTyperLine">
-				{this.state.text}
+			<div className={clss}>
+				{this.renderName()}
+				<span className="CyberTyperLineText">{this.state.text}</span>
 				{this.renderCursor()}
 			</div>
 		);
+	}
+	
+	renderName() {
+		if (this.props.displayName!==false && this.props.speaker && this.props.speaker.name && this.state.text.length) {
+			return (<span className="CyberTyperLineName">{this.props.speaker.name}</span>);
+		}
+		else {
+			return (<span className="CyberTyperLineNoName"/>);
+		}
 	}
 	
 	renderCursor() {

@@ -66,69 +66,54 @@ const cyberTyperScript = [
 		}
 	},
 	{
-		text: 'I am Roy',
+		text: 'I am Leon',
 		speaker: {
-			voice: 'Roy'
+			voice: 'Leon'
 		}
 	}
 ];
-
 ```
 
+A display name and custom CSS class can be specified for each line:
+
+```
+const cyberTyperScript = [
+	{
+		text: 'I am Cylon',
+		speaker: {
+			voice: 'Cylon',
+			name: 'Cylon',
+			className: 'cyloncss'
+		}
+	},
+	{
+		text: 'I am Leon',
+		speaker: {
+			voice: 'Leon',
+			name: 'Leon',
+			className: 'roycss'
+		}
+	}
+];
+```
 
 ### Component Usage
 
 ```
 <CyberTyper
-    say={voice}
-    sayProfile={'Jack'}
-    script={cyberTyperScript}
-    maxLines={15}
-    lineBreakDuration={100}
-    start={true}
-    hideCursorWhenDone={true}
+	script={cyberTyperScript}
+	maxLines={15}
+	lineBreakDuration={200}
+	hideCursorWhenDone={true}
 	onComplete={() => {
 		console.log('CyberTyper complete');
 }}/>
 ```
 
-The component will not begin until the `start` property is set to true.  Beware, this cannot be autostarted on page load because web browsers disable JavaScript AudioContext usage until after a user action.  The examples show how to set `start={true}` from a button click.
+Beware: web browsers disable JavaScript AudioContext usage until after a user action.  So `<CyberTyper/>` should be rendered after a mouse click or keyboard action.
 
 ### Custom CSS
 
-The `\<CyberTyper/\>` component does not include any CSS of it's own.  But the DIV and SPAN elements have the `.CyberTyper` class defined which can be used to customize how the generated lines look, including the styling of a cursor.
+The `<CyberTyper/>` component does not include any CSS of it's own.  But the DIV and SPAN elements have `.CyberTyper` classes defined which can be used to customize how the generated lines look, including the styling of a cursor and names.
 
-```
-.CyberTyper {
-    text-align: center;
-}
-.CyberTyperLine {
-    position: relative;
-}
-.CyberTyperLineBreak {
-    clear: both;
-}
-.CyberTyperLineCursor {
-    position: relative;
-    animation: blinker 1s linear infinite;
-    margin-left: 0.5em;
-}
-.CyberTyperLineCursor::after {
-    content: "▌";
-}
-.CyberTyperLineFloatingCursor {
-    position: absolute;
-}
-.CyberTyperLineFloatingCursor::after {
-    content: "▌";
-}
-.CyberTyperLineFloatingCursor.CyberTyperFlashing {
-    animation: blinker 1s linear infinite;
-}
-
-@keyframes blinker {
-    50% {
-        opacity: 0;
-    }
-}
-```
+See [CyberTyper.css](https://github.com/jaxcore/cybertyper/blob/master/examples/palefire/src/CyberTyper.css)

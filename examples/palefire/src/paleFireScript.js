@@ -1,13 +1,13 @@
 const Interrogator = {
 	name: 'Interrogator',
 	voice: 'Cylon',
-	className: 'Interrogator',
+	className: 'blue',
 	displayName: true
 };
 const K = {
 	name: 'K',
 	voice: 'Roy',
-	className: 'K',
+	className: 'grey',
 	displayName: true
 };
 
