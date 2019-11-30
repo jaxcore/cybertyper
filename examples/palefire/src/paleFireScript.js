@@ -179,6 +179,21 @@ module.exports = [
 	},
 	{
 		text: ['Within cells interlinked.','Within cells interlinked.','Within cells interlinked.'],
-		speaker: K
+		speaker: K,
+		linebreak: true
+	},
+	{
+		text: 'We\'re done.',
+		speaker: Interrogator,
+		linebreak: true
+	},
+	{
+		text: ['Constant K...', 'you can pick up your bonus.'],
+		speaker: Interrogator,
+		linebreak: true
+	},
+	{
+		text: 'Thank you, sir.',
+		speaker: K,
 	}
 ];
