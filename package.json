@@ -1,6 +1,6 @@
 {
   "name": "cybertyper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ReactJS component for automatically typing text synchronized with speech synthesis & recognition",
   "main": "build/index.js",
   "directories": {
@@ -13,7 +13,7 @@
     "build": "webpack",
     "build-examples": "cd examples/palefire && yarn build",
     "copydocs": "rm -rf docs/palefire && cp -r examples/palefire/build docs/palefire",
-    "build-docs": ""
+    "build-all": "npm run build-examples && npm run copydocs"
   },
   "repository": {
     "type": "git",

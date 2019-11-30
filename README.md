@@ -80,11 +80,13 @@ const cyberTyperScript = [
 
 ```
 <CyberTyper
-	say={voice} 
-	sayProfile={'Jack'}
-	script={cyberTyperScript}
-	maxLines={15}
-	start={true}
+    say={voice}
+    sayProfile={'Jack'}
+    script={cyberTyperScript}
+    maxLines={15}
+    lineBreakDuration={100}
+    start={true}
+    hideCursorWhenDone={true}
 	onComplete={() => {
 		console.log('CyberTyper complete');
 }}/>
@@ -109,7 +111,7 @@ The `\<CyberTyper/\>` component does not include any CSS of it's own.  But the D
 .CyberTyperLineCursor {
     position: relative;
     animation: blinker 1s linear infinite;
-    margin-left: 1em;
+    margin-left: 0.5em;
 }
 .CyberTyperLineCursor::after {
     content: "▌";
