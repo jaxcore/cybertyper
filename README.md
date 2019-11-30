@@ -102,8 +102,8 @@ const cyberTyperScript = [
 ```
 <CyberTyper
     autostart={true}
-	script={cyberTyperScript}
-	maxLines={15}
+    script={cyberTyperScript}
+    maxLines={15}
 	lineBreakDuration={200}
 	hideCursorWhenDone={true}
 	onComplete={() => {
