@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import EventEmitter from 'events';
 // import './CyberTyper.css';
 import CyberTyperLine from './CyberTyperLine';
 import CyberTyperLineBreak from './CyberTyperLineBreak';
@@ -6,6 +7,8 @@ import CyberTyperLineBreak from './CyberTyperLineBreak';
 class CyberTyper extends Component {
 	constructor(props) {
 		super(props);
+		
+		this.events = new EventEmitter();
 		
 		let script = props.script;
 		let processedScript = [];
@@ -19,13 +22,15 @@ class CyberTyper extends Component {
 						if (index === 0) {
 							s.speaker = {
 								...line.speaker,
-								displayName: true
+								displayName: true,
+								lineNum: processedScript.length
 							};
 						}
 						else {
 							s.speaker = {
 								...line.speaker,
-								displayName: false
+								displayName: false,
+								lineNum: processedScript.length
 							};
 						}
 						processedScript.push(s);
@@ -34,27 +39,28 @@ class CyberTyper extends Component {
 				else if (line.text.toString) {
 					processedScript.push({
 						text: line.text.toString(),
-						speaker: line.speaker
+						speaker: line.speaker,
+						lineNum: processedScript.length
 					});
 				}
 			}
 			if (line.linebreak) {
 				if (typeof line.linebreak === 'number') {
-					for (let i=0;i<line.linebreak;i++) {
+					for (let i = 0; i < line.linebreak; i++) {
 						processedScript.push({
-							linebreak: true
+							linebreak: true,
+							lineNum: processedScript.length
 						});
 					}
 				}
 				else {
 					processedScript.push({
-						linebreak: true
+						linebreak: true,
+						lineNum: processedScript.length
 					});
 				}
 			}
-		
 		});
-		//console.log('processedScript', processedScript);
 		
 		let hideCursorWhenDone = true;
 		if ('hideCursorWhenDone' in props) hideCursorWhenDone = props.hideCursorWhenDone;
@@ -67,6 +73,11 @@ class CyberTyper extends Component {
 			done: false,
 			started: props.start || false,
 			syllableDuration: 300
+		};
+		
+		this.audioCache = {
+			playing: null,
+			next: null
 		};
 	}
 	
@@ -88,7 +99,9 @@ class CyberTyper extends Component {
 	
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		if (snapshot && 'started' in snapshot) {
-			this.next();
+			this.cacheNextAudio(0, (duration) => {
+				this.next();
+			});
 		}
 	}
 	
@@ -96,16 +109,37 @@ class CyberTyper extends Component {
 		let progress = this.state.progress + 1;
 		let script = this.state.script;
 		if (progress <= script.length) {
-			script[progress - 1].started = true;
-			script[progress - 1].lineNum = progress - 1;
 			
-			let lines = this.state.lines;
-			if (progress === 1) lines.push(script[progress - 1]);
+			const scriptline = script[progress - 1];
 			
-			this.setState({
-				lines,
-				progress
-			});
+			const done = () => {
+				scriptline.started = true;
+				scriptline.lineNum = progress - 1;
+				
+				let lines = this.state.lines;
+				if (progress === 1) lines.push(scriptline);
+				
+				this.setState({
+					lines,
+					progress
+				});
+			};
+			
+			if (scriptline.linebreak) {
+				done();
+			}
+			else if (scriptline.text) {
+				if (scriptline.cached) {
+					done();
+				}
+				else {
+					// console.log('waiting for audio cache', scriptline);
+					this.events.once('audio-cached-' + scriptline.lineNum, (duration) => {
+						done();
+					});
+				}
+			}
+			
 		}
 	}
 	
@@ -120,7 +154,7 @@ class CyberTyper extends Component {
 	
 	renderCursor() {
 		if (this.state.isDelaying || (this.state.done && !this.state.hideCursorWhenDone)) {
-			return (<div className="CyberTyperLineCursor CyberTyperFlashing" />);
+			return (<div className="CyberTyperLineCursor CyberTyperFlashing"/>);
 		}
 	}
 	
@@ -135,33 +169,25 @@ class CyberTyper extends Component {
 					if (line.linebreak) {
 						return (<CyberTyperLineBreak key={lineNum}
 													 delay={line.delay}
-						
-													 onstarted={line.onstarted}
-													 onStart={() => {
-														 this.onStart(lineNum);
+													 onStart={(callback) => {
+														 this.onStart(lineNum, line, callback);
 													 }}
-						
-													 onended={line.onended}
 													 onEnd={() => {
-														 this.onEnd(lineNum);
+														 this.onEnd(lineNum, line);
 													 }}
 						/>);
 					}
 					else {
 						return (<CyberTyperLine key={lineNum}
-												voice={this.props.say}
 												text={line.text}
-												speaker={line.speaker}
+												duration={line.duration}
 												delay={line.delay}
 												syllableDuration={this.state.syllableDuration}
-												onstarted={line.onstarted}
-												onStart={() => {
-													this.onStart(lineNum);
+												onStart={(callback) => {
+													this.onStart(lineNum, line, callback);
 												}}
-						
-												onended={line.onended}
 												onEnd={() => {
-													this.onEnd(lineNum);
+													this.onEnd(lineNum, line);
 												}}
 						/>);
 					}
@@ -170,17 +196,99 @@ class CyberTyper extends Component {
 		}
 	}
 	
-	onStart(index) {
-		console.log('line start', index);
+	onStart(index, line, callback) {
+		if (line.onstarted) line.onstarted();
+		
+		if (line.linebreak) {
+			this.audioCache.next = null;
+			this.cacheNextAudio(index + 1);
+			callback();
+		}
+		else if (line.text) {
+			if (line.cached) {
+				if (this.audioCache.next.lineNum === index) {
+					this.audioCache.current = this.audioCache.next;
+					this.audioCache.next = null;
+					this.cacheNextAudio(index + 1);
+					this.playCurrentAudio();
+					
+					callback();
+				}
+				else console.log('wrong num', this.audioCache.next);
+			}
+			else {
+				console.log('audio onStart NOT CACHED');
+			}
+		}
 	}
 	
-	onEnd(index) {
-		console.log('line end', index);
+	playCurrentAudio() {
+		const current = this.audioCache.current;
+		const audioContext = this.audioCache.current.audioContext;
+		const source = this.audioCache.current.source;
+		source.connect(audioContext.destination);
+		source.onended = () => {
+			audioContext.close();
+			if (current.lineEnded) {
+				this.next();
+			}
+			else {
+				current.audioEnded = true;
+			}
+		};
+		source.start(0);
+	}
+	
+	cacheNextAudio(nextIndex, callback) {
 		
-		let lineBreakDuration = 300;
+		if (!this.state.script[nextIndex]) {
+			console.log('no nextIndex', nextIndex);
+			return;
+		}
+		
+		const line = this.state.script[nextIndex];
+		const script = this.state.script;
+		
+		if (line.linebreak) {
+			if (callback) callback(null);
+			return;
+		}
+		
+		const sayOptions = {};
+		if (line.speaker && line.speaker.voice) {
+			sayOptions.profile = line.speaker.voice;
+		}
+		else {
+			sayOptions.profile = this.props.sayProfile;
+		}
+		
+		this.props.say.getWorkerAudioData(line.text, sayOptions, (audioContext, source) => {
+			let duration = source.buffer.duration * 1000;
+			
+			line.duration = duration;
+			line.cached = true;
+			
+			this.audioCache.next = {
+				lineNum: nextIndex,
+				audioContext,
+				source,
+				audioEnded: false
+			};
+			
+			this.setState({
+				script
+			}, () => {
+				this.events.emit('audio-cached-' + line.lineNum, duration);
+				if (callback) callback(duration);
+			});
+		});
+	}
+	
+	onEnd(index, line) {
+		let lineBreakDuration = this.props.lineBreakDuration || 200;
 		
 		let progress = this.state.progress + 1;
-		let script = this.state.script;
+		const script = this.state.script;
 		
 		if (progress <= script.length) {
 			let delay = script[progress - 1].delay || lineBreakDuration;
@@ -202,7 +310,21 @@ class CyberTyper extends Component {
 					this.setState({
 						isDelaying: false
 					}, () => {
-						this.next();
+						
+						if (line.onended) line.onended();
+						
+						if (line.linebreak) {
+							this.next();
+						}
+						else if (line.text) {
+							if (this.audioCache.current.audioEnded) {
+								this.next();
+							}
+							else {
+								// console.log('waiting for audio-ended');
+								this.audioCache.current.lineEnded = true;
+							}
+						}
 					});
 				}, delay);
 			});
@@ -211,6 +333,8 @@ class CyberTyper extends Component {
 			this.setState({
 				done: true
 			}, () => {
+				if (line.onended) line.onended();
+				
 				if (this.props.onComplete) {
 					this.props.onComplete();
 				}

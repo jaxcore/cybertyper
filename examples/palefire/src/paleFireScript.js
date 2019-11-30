@@ -25,8 +25,7 @@ module.exports = [
 	},
 	{
 		text: 'Cells.',
-		speaker: Interrogator,
-		linebreak: true
+		speaker: Interrogator
 	},
 	{
 		text: 'Cells.',
@@ -34,9 +33,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['Have you ever been in an institution?', 'Cells.'],
+		text: 'Have you ever been in an institution?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Cells.',
+		speaker: Interrogator,
 	},
 	{
 		text: 'Cells.',
@@ -44,9 +47,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['Do they keep you in a cell?','Cells.'],
+		text: 'Do they keep you in a cell?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Cells.',
+		speaker: Interrogator,
 	},
 	{
 		text: 'Cells.',
@@ -54,9 +61,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['When you\'re not performing your duties do they keep you in a little box?','Cells.'],
+		text: 'When you\'re not performing your duties do they keep you in a little box?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Cells.',
+		speaker: Interrogator,
 	},
 	{
 		text: 'Cells.',
@@ -65,8 +76,7 @@ module.exports = [
 	},
 	{
 		text: 'Interlinked.',
-		speaker: Interrogator,
-		linebreak: true
+		speaker: Interrogator
 	},
 	{
 		text: 'Interlinked.',
@@ -74,9 +84,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['What\'s it like to hold the hand of someone you love?', 'Interlinked.'],
+		text: 'What\'s it like to hold the hand of someone you love?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Interlinked.',
+		speaker: Interrogator
 	},
 	{
 		text: 'Interlinked.',
@@ -84,9 +98,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['Did they teach you how to feel finger to finger?', 'Interlinked.'],
+		text: 'Did they teach you how to feel finger to finger?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Interlinked.',
+		speaker: Interrogator
 	},
 	{
 		text: 'Interlinked.',
@@ -94,9 +112,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['Do you long for having your heart interlinked?', 'Interlinked.'],
+		text: 'Do you long for having your heart interlinked?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Interlinked.',
+		speaker: Interrogator
 	},
 	{
 		text: 'Interlinked.',
@@ -114,9 +136,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['What\'s it like to hold your child in your arms?','Interlinked.'],
+		text: 'What\'s it like to hold your child in your arms?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Interlinked.',
+		speaker: Interrogator
 	},
 	{
 		text: 'Interlinked.',
@@ -124,9 +150,13 @@ module.exports = [
 		linebreak: true
 	},
 	{
-		text: ['Do you feel that there\'s a part of you that\'s missing?','Interlinked.'],
+		text: 'Do you feel that there\'s a part of you that\'s missing?',
 		speaker: Interrogator,
 		linebreak: true
+	},
+	{
+		text: 'Interlinked.',
+		speaker: Interrogator
 	},
 	{
 		text: 'Interlinked.',
@@ -135,8 +165,7 @@ module.exports = [
 	},
 	{
 		text: 'Within cells interlinked.',
-		speaker: Interrogator,
-		linebreak: true
+		speaker: Interrogator
 	},
 	{
 		text: 'Within cells interlinked.',

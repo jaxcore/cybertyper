@@ -2,9 +2,6 @@ import React, {Component} from 'react';
 
 import syllable from 'syllable';
 
-global.syllable = syllable;
-console.log('syllable', syllable);
-
 class CyberTyperLine extends Component {
 	constructor(props) {
 		super(props);
@@ -14,13 +11,11 @@ class CyberTyperLine extends Component {
 		const words = text.split(' ');
 		let wordIntervals = [];
 		let totalSyllables = 0;
-		
-		let syllableDuration = this.props.syllableDuration;
-		// todo: for text-to-speech need use audio length to calculate the required syllableDuration
+		let totalSpaces = 0;
 		
 		words.forEach((text, index) => {
 			let wordSyllables;
-			if (text.length===1) wordSyllables = 1;
+			if (text.length === 1) wordSyllables = 1;
 			else wordSyllables = syllable(text);
 			totalSyllables += wordSyllables;
 			
@@ -30,7 +25,8 @@ class CyberTyperLine extends Component {
 			});
 			
 			if (index < words.length - 1) {
-				totalSyllables += 1;
+				// totalSyllables += 1;
+				totalSpaces += 1;
 				
 				wordIntervals.push({
 					space: true,
@@ -40,9 +36,19 @@ class CyberTyperLine extends Component {
 			}
 		});
 		
-		// generate the duration
-		const totalDuration = totalSyllables * syllableDuration;
+		let syllableDuration;
+		let totalDuration;
 		
+		if (this.props.duration) {
+			// generate the syllableDuration based on the audio duration
+			totalDuration = this.props.duration;
+			syllableDuration = (totalDuration / totalSyllables) * 0.94;
+		}
+		else {
+			// generate the duration based on a fixed syllable duration
+			syllableDuration = this.props.syllableDuration;
+			totalDuration = totalSyllables * syllableDuration;
+		}
 		
 		this.state = {
 			text: '',
@@ -53,9 +59,11 @@ class CyberTyperLine extends Component {
 			duration: 0,
 			letterDuration: 0,
 			totalDuration,
+			accumulatedDuration: 0,
+			syllableDuration,
 			lineBreakDuration: 100,
-			spaceDuration: 100,
-			periodDuration: 100,
+			// spaceDuration: 100,
+			// periodDuration: 100,
 			totalSyllables,
 			letterCount: props.text.length,
 			wordIntervals
@@ -63,16 +71,9 @@ class CyberTyperLine extends Component {
 	}
 	
 	componentDidMount() {
-		this.props.onStart();
-		if (this.props.onstarted) this.props.onstarted();
-		
-		// todo: use getAudioData
-		this.props.voice.say(this.props.text, {
-			profile: this.props.speaker? this.props.speaker.voice:null
-		}).then(() => {
+		this.props.onStart(() => {
 			this.next();
 		});
-		
 	}
 	
 	next() {
@@ -107,31 +108,40 @@ class CyberTyperLine extends Component {
 		
 		let letterDuration;
 		if (wordInterval.space) {
-			letterDuration = this.state.spaceDuration;
+			// letterDuration = this.state.spaceDuration;
+			// letterDuration = this.state.syllableDuration;
+			letterDuration = 0;
 		}
 		else {
-			letterDuration = wordInterval.syllables * this.props.syllableDuration / wordInterval.text.length;
+			letterDuration = wordInterval.syllables * this.state.syllableDuration / wordInterval.text.length;
 		}
 		
+		let letter;
 		if (wordInterval.space) {
-			text += ' ';
+			letter = ' ';
 		}
 		else {
-			text += wordInterval.text[letterProgress - 1];
+			letter = wordInterval.text[letterProgress - 1];
 		}
+		text += letter;
+		
+		let accumulatedDuration = this.state.accumulatedDuration;
+		
+		accumulatedDuration += letterDuration;
 		
 		const s = {
 			text,
 			letterDuration,
 			letterProgress,
-			wordProgress
+			wordProgress,
+			accumulatedDuration
 		};
 		
 		this.setState(s, () => {
 			
 			if (wordProgress === this.state.wordIntervals.length
 				&& letterProgress === wordInterval.text.length) {
-					
+				
 				let {wordProgress} = this.state;
 				wordProgress++;
 				this.setState({
@@ -142,7 +152,6 @@ class CyberTyperLine extends Component {
 						this.setState({
 							done: true
 						}, () => {
-							console.log('done');
 							this.props.onEnd();
 							if (this.props.onended) this.props.onended();
 						});
@@ -151,11 +160,9 @@ class CyberTyperLine extends Component {
 				});
 			}
 			else {
-				if (this.state.letterDuration) {
-					setTimeout(() => {
-						this.next();
-					}, this.state.letterDuration);
-				}
+				setTimeout(() => {
+					this.next();
+				}, this.state.letterDuration);
 			}
 			
 		});
@@ -177,7 +184,7 @@ class CyberTyperLine extends Component {
 				return (<span className={clss}/>);
 			}
 			else {
-				return (<div className="CyberTyperLineCursor CyberTyperFlashing" />);
+				return (<div className="CyberTyperLineCursor CyberTyperFlashing"/>);
 			}
 		}
 	}

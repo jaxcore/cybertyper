@@ -16,8 +16,7 @@ const quickBrownFox = [
 		linebreak: true
 	},
 	{
-		text: 'the lazy dog.',
-		linebreak: true
+		text: 'the lazy dog.'
 	}
 ];
 
@@ -60,8 +59,9 @@ class PaleFireApp extends Component {
 					sayProfile={'Jack'}
 					script={this.state.cyberscript}
 					maxLines={15}
+					lineBreakDuration={100}
 					start={this.state.started}
-					hideCursorWhenDone={false}
+					hideCursorWhenDone={true}
 					onComplete={() => {
 						console.log('CyberTyper complete');
 					}}/>

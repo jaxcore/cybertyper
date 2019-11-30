@@ -10,15 +10,14 @@ class CyberTyperLineBreak extends Component {
 	}
 	
 	componentDidMount() {
-		this.props.onStart();
-		if (this.props.onstarted) this.props.onstarted();
-		
-		this.setState({
-			done: true
-		}, () => {
-			console.log('done');
-			this.props.onEnd();
-			if (this.props.onended) this.props.onended();
+		this.props.onStart(() => {
+			this.setState({
+				done: true
+			}, () => {
+				console.log('done');
+				this.props.onEnd();
+				// if (this.props.onended) this.props.onended();
+			});
 		});
 	}
 	
