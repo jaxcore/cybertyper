@@ -2,7 +2,7 @@
   "name": "palefire",
   "version": "0.0.0",
   "dependencies": {
-    "cybertyper": "^0.0.2",
+    "cybertyper": "^0.0.3",
     "jaxcore-say": "^0.0.3",
     "fsevents": "^2.1.2",
     "react": "^16.12.0",

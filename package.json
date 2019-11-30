@@ -1,6 +1,6 @@
 {
   "name": "cybertyper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ReactJS component for automatically typing text synchronized with speech synthesis & recognition",
   "main": "build/index.js",
   "directories": {
